@@ -219,14 +219,14 @@ public class CatClass
     }
 
     // Destroy cat
-    private void DestroyCat()
+    public void DestroyCat()
     {
         Object.Destroy(catObject);
         isActive = false;
     }
 
     // Check if cat reached the other side
-    public virtual void BorderCheck()
+    public virtual void BottomCheck()
     {
         bool outOfBounds = false;
 
@@ -255,7 +255,7 @@ public class CatClass
         if (!isActive)
             return true;
 
-        BorderCheck();
+        BottomCheck();
 
         return !isActive;
     }
@@ -274,10 +274,9 @@ public class CatClass
         if (invisibleCats)
         {
             currentTransparency += (1f / invisibilityTime) * deltaTime;
-
             spriteRenderer.color = new Color(1f, 1f, 1f, 1f - currentTransparency);
         }
 
-        BorderCheck();
+        BottomCheck();
     }
 }

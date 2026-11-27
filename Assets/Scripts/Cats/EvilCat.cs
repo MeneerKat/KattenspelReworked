@@ -16,6 +16,7 @@ public class EvilCat : CatClass
         AudioClip PurrSound,
         AudioClip BoingSound,
         AudioClip CrashSound,
+
         AudioClip HissSound,
         AudioClip EvilMeowSound
     )
@@ -35,12 +36,14 @@ public class EvilCat : CatClass
     }
 
     // Override hit function
-    public override void Hit()
+    public override void OnHit()
     {
         GameManager.Instance.RemoveHealth(1);
         AudioSource.PlayClipAtPoint(hissSound, catObject.transform.position);
+        DestroyCat();
     }
 
+    // Override miss function
     public override void Miss()
     {
         AudioSource.PlayClipAtPoint(evilMeowSound, catObject.transform.position);

@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -182,29 +183,48 @@ public class GameManager : MonoBehaviour
         {
             if (activeCats.Count >= maximumCats) { return; }
 
-            CatClass newCat = new CatClass(
-                catPrefab, 
-                new List<Sprite> { catImage1, catImage2, catImage3 },
-                horizontalSpeed, 
-                verticalSpeed, 
-                rotationSpeed,
-                purrSound,
-                boingSound,
-                crashSound);
-
-            CatClass newEvilCat = new EvilCat(
-                catPrefab,
-                new List<Sprite> { evilCatImage1, evilCatImage2, evilCatImage3 },
-                horizontalSpeed,
-                verticalSpeed,
-                rotationSpeed,
-                purrSound,
-                boingSound,
-                crashSound,
-                hissSound,
-                evilMeowSound);
-
-            activeCats.Add(newEvilCat);
+            if (evilCats == true && UnityEngine.Random.Range(1, 100) < evilPercentage)
+            {
+                CatClass newEvilCat = new EvilCat(
+                    catPrefab,
+                    new List<Sprite> { evilCatImage1, evilCatImage2, evilCatImage3 },
+                    horizontalSpeed,
+                    verticalSpeed,
+                    rotationSpeed,
+                    purrSound,
+                    boingSound,
+                    crashSound,
+                    hissSound,
+                    evilMeowSound);
+                activeCats.Add(newEvilCat);
+            }
+            else if (coolCats == true && UnityEngine.Random.Range(1, 50) < coolPercentage)
+            {
+                CatClass newCoolCat = new CoolCat(
+                    catPrefab,
+                    new List<Sprite> { coolCatImage1 },
+                    horizontalSpeed,
+                    verticalSpeed,
+                    rotationSpeed,
+                    purrSound,
+                    boingSound,
+                    crashSound,
+                    healSound);
+                activeCats.Add(newCoolCat);
+            }
+            else
+            {
+                CatClass newCat = new CatClass(
+                    catPrefab,
+                    new List<Sprite> { catImage1, catImage2, catImage3 },
+                    horizontalSpeed,
+                    verticalSpeed,
+                    rotationSpeed,
+                    purrSound,
+                    boingSound,
+                    crashSound);
+                activeCats.Add(newCat);
+            }
 
             timer = 0f;
         }
