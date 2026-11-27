@@ -279,4 +279,10 @@ public class CatClass
 
         BottomCheck();
     }
+
+    public virtual void NukeEffect()
+    {
+
+        // Launch cat based on nearby nukes and distance
+    }
 }

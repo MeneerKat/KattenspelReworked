@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CatCollision : MonoBehaviour, ICanHit
+public class CatCollision : MonoBehaviour, ICanHit, INukable
 {
     private CatClass catClass;
 
@@ -14,6 +14,14 @@ public class CatCollision : MonoBehaviour, ICanHit
         if (catClass != null)
         {
             catClass.OnHit();
+        }
+    }
+
+    public void NukeEffect()
+    {
+        if (catClass != null)
+        {
+            catClass.NukeEffect();
         }
     }
 }
