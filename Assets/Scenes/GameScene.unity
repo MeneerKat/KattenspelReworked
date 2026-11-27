@@ -827,7 +827,6 @@ MonoBehaviour:
   startHealth: 5
   currentHealth: 5
   damagePerHit: 1
-  healingPerHit: 1
   baseStartPosition: {x: 0, y: -4}
   backgroundCanvas: {fileID: 479760429}
   scoreCanvas: {fileID: 395336263}
@@ -849,6 +848,10 @@ MonoBehaviour:
   invisibilityTime: 2.2
   surroundingSpawnRateIncrease: 1.35
   surroundingStartPosition: {x: 0, y: 0}
+  nukePrefab: {fileID: 6805678765532143991, guid: 5631535f4c4b68443b015949431ae5ff, type: 3}
+  nukeSpeed: 150
+  nukeRange: 8
+  nukeMaxForce: 2000
   catImage1: {fileID: -2359638610136418311, guid: 4ff1120acd522444080c69e140bcd341, type: 3}
   catImage2: {fileID: 8903766432266672828, guid: 8806dc2d68a34f9429d520efceff9579, type: 3}
   catImage3: {fileID: 8245074977905487612, guid: 3fb4f88fe883e914e9fcbe8a821cb10b, type: 3}

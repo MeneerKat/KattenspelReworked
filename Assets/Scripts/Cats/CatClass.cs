@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class CatClass
 {
@@ -280,9 +281,26 @@ public class CatClass
         BottomCheck();
     }
 
-    public virtual void NukeEffect()
+    public void NukeEffect()
     {
+        float nukeForce = GameManager.Instance.nukeMaxForce;
+        float nukeRange = GameManager.Instance.nukeRange;
+        Collider2D[] nearbyObjects = Physics2D.OverlapCircleAll(catObject.transform.position, nukeRange);
 
-        // Launch cat based on nearby nukes and distance
+        foreach (Collider2D obj in nearbyObjects)
+        {
+            if (!obj.CompareTag("Nuke"))
+                continue;
+
+            Vector2 direction = (Vector2)catObject.transform.position - (Vector2)obj.transform.position;
+            float distance = direction.magnitude;
+
+            if (distance <= 0.01f)
+                continue;
+
+            // Closer = stronger force
+            float force = Mathf.Lerp(nukeForce, 0f, distance / nukeRange);
+            rb.AddForce(direction.normalized * force, ForceMode2D.Force);
+        }
     }
 }

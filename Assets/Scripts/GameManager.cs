@@ -6,6 +6,7 @@ using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -79,6 +80,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] public float surroundingSpawnRateIncrease = 2.5f;
     [SerializeField] public Vector2 surroundingStartPosition = new Vector2(0, 0);
 
+    // Nuke settings
+    [Space]
+    [Header("Nuke Settings")]
+    [SerializeField] public GameObject nukePrefab;
+    [SerializeField] public float nukeSpeed = 150f;
+    [SerializeField] public float nukeRange = 8f;
+    [SerializeField] public float nukeMaxForce = 200f;
+    [SerializeField] public float nukeMinSpawnTime = 5f;
+    [SerializeField] public float nukeMaxSpawnTime = 30f;
+    [SerializeField] public float nukeSpawnDifferencePerOoM = 0.7f;
+    [SerializeField] public int nukeMinimumScore = 10; // 10k
+
     // Images
     [Space]
     [Header("Cat Image Settings")]
@@ -115,8 +128,12 @@ public class GameManager : MonoBehaviour
     // Private Variables
     private float cooldown;
     private float timer;
+    private float nukeTimer;
     private List<CatClass> activeCats = new();
+    private List<NukeClass> activeObjects = new();
     private Camera cam;
+    private float screenSizeX;
+    private float screenSizeY;
 
     // Singleton
     public static GameManager Instance { get; private set; }
@@ -133,6 +150,7 @@ public class GameManager : MonoBehaviour
 
         // Camera
         cam = Camera.main;
+        GetScreenBorders();
         
         // Cooldown
         cooldown = 1 / baseCatsPerSecond;
@@ -160,6 +178,10 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        // Update Timers
+        nukeTimer += Time.deltaTime;
+        timer += Time.deltaTime;
+
         // Update all cats
         for (int i = activeCats.Count - 1; i >= 0; i--)
         {
@@ -174,6 +196,23 @@ public class GameManager : MonoBehaviour
             else
             {
                 localCat.MoveCat(Time.deltaTime);
+            }
+        }
+
+        // Update all objects
+        for (int i = activeObjects.Count - 1; i >= 0; i--)
+        {
+            // Tick object
+            NukeClass localObject = activeObjects[i];
+
+            if (localObject.isActive == false)
+            {
+                localObject.DestroyObject();
+                activeObjects.RemoveAt(i);
+            }
+            else
+            {
+                localObject.Tick(Time.deltaTime);
             }
         }
 
@@ -229,7 +268,28 @@ public class GameManager : MonoBehaviour
             timer = 0f;
         }
 
-        timer += Time.deltaTime;
+        // Spawn new nuke
+        float nukeTimeOffset = (nukeMaxSpawnTime - nukeMinSpawnTime) * (MathF.Pow(nukeSpawnDifferencePerOoM, MathF.Log10(score)));
+        if (nukeTimer >= nukeMinSpawnTime + nukeTimeOffset)
+        {
+            NukeClass newNuke = new NukeClass(
+                nukePrefab,
+                nukeSpeed,
+                new Vector2(Random.Range(-0.5f, 0.5f) * screenSizeX, Random.Range(-0.5f, 0.5f) * screenSizeY)
+            );
+
+            activeObjects.Add(newNuke);
+            nukeTimer = 0f;
+        }
+    }
+
+    // Get screen borders
+    public void GetScreenBorders()
+    {
+        Camera cam = Camera.main;
+
+        screenSizeX = cam.orthographicSize * cam.aspect;
+        screenSizeY = cam.orthographicSize;
     }
 
     // Add correct score
