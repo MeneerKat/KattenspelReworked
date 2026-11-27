@@ -84,6 +84,7 @@ public class GameManager : MonoBehaviour
     [Space]
     [Header("Nuke Settings")]
     [SerializeField] public GameObject nukePrefab;
+    [SerializeField] public GameObject nukeTargetPrefab;
     [SerializeField] public float nukeSpeed = 150f;
     [SerializeField] public float nukeRange = 8f;
     [SerializeField] public float nukeMaxForce = 200f;
@@ -91,6 +92,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public float nukeMaxSpawnTime = 30f;
     [SerializeField] public float nukeSpawnDifferencePerOoM = 0.7f;
     [SerializeField] public int nukeMinimumScore = 10; // 10k
+    [SerializeField] public float nukeTargetRotationSpeed = 20f;
 
     // Images
     [Space]
@@ -237,7 +239,7 @@ public class GameManager : MonoBehaviour
                     evilMeowSound);
                 activeCats.Add(newEvilCat);
             }
-            else if (coolCats == true && UnityEngine.Random.Range(1, 50) < coolPercentage)
+            else if (coolCats == true && UnityEngine.Random.Range(1, evilCats ? 100 - evilPercentage : 100) < coolPercentage)
             {
                 CatClass newCoolCat = new CoolCat(
                     catPrefab,
@@ -274,6 +276,7 @@ public class GameManager : MonoBehaviour
         {
             NukeClass newNuke = new NukeClass(
                 nukePrefab,
+                nukeTargetPrefab,
                 nukeSpeed,
                 new Vector2(Random.Range(-0.5f, 0.5f) * screenSizeX, Random.Range(-0.5f, 0.5f) * screenSizeY)
             );

@@ -250,6 +250,47 @@ public class CatClass
         }
     }
 
+    // Bounce back when hitting the sides
+    public virtual void BorderCheck()
+    {
+        Vector2 position = catObject.transform.position;
+        Vector2 velocity = rb.linearVelocity;
+
+        if (spawnSide == "Top" || spawnSide == "Bottom")
+        {
+            // Left border
+            if (position.x <= -screenSizeX + catSize)
+            {
+                position.x = -screenSizeX + catSize;
+                velocity.x = Mathf.Abs(velocity.x);
+            }
+            // Right border
+            else if (position.x >= screenSizeX - catSize)
+            {
+                position.x = screenSizeX - catSize;
+                velocity.x = -Mathf.Abs(velocity.x);
+            }
+        }
+        else if (spawnSide == "Right" || spawnSide == "Left")
+        {
+            // Bottom border
+            if (position.y <= -screenSizeY + catSize)
+            {
+                position.y = -screenSizeY + catSize;
+                velocity.y = Mathf.Abs(velocity.y);
+            }
+            // Top border
+            else if (position.y >= screenSizeY - catSize)
+            {
+                position.y = screenSizeY - catSize;
+                velocity.y = -Mathf.Abs(velocity.y);
+            }
+        }
+
+        catObject.transform.position = position;
+        rb.linearVelocity = velocity;
+    }
+
     // Check if cat is out of bounds
     public virtual bool OutOfBoundsCheck()
     {
@@ -278,6 +319,7 @@ public class CatClass
             spriteRenderer.color = new Color(1f, 1f, 1f, 1f - currentTransparency);
         }
 
+        BorderCheck();
         BottomCheck();
     }
 
@@ -285,22 +327,42 @@ public class CatClass
     {
         float nukeForce = GameManager.Instance.nukeMaxForce;
         float nukeRange = GameManager.Instance.nukeRange;
-        Collider2D[] nearbyObjects = Physics2D.OverlapCircleAll(catObject.transform.position, nukeRange);
+
+        Collider2D[] nearbyObjects = Physics2D.OverlapCircleAll(
+            catObject.transform.position,
+            nukeRange
+        );
+
+        Vector2 totalForce = Vector2.zero;
 
         foreach (Collider2D obj in nearbyObjects)
         {
             if (!obj.CompareTag("Nuke"))
                 continue;
 
-            Vector2 direction = (Vector2)catObject.transform.position - (Vector2)obj.transform.position;
+            Vector2 direction = (Vector2)catObject.transform.position -
+                                (Vector2)obj.transform.position;
+
             float distance = direction.magnitude;
 
-            if (distance <= 0.01f)
+            if (distance <= 0.01f || distance > nukeRange)
                 continue;
 
-            // Closer = stronger force
-            float force = Mathf.Lerp(nukeForce, 0f, distance / nukeRange);
-            rb.AddForce(direction.normalized * force, ForceMode2D.Force);
+            direction.Normalize();
+
+            // Stronger force when closer
+            float forceMultiplier = 1f - (distance / nukeRange);
+            float force = nukeForce * forceMultiplier;
+
+            totalForce += direction * force;
+        }
+
+        // Limit total force to the maximum
+        totalForce = Vector2.ClampMagnitude(totalForce, nukeForce);
+
+        if (totalForce != Vector2.zero)
+        {
+            rb.AddForce(totalForce, ForceMode2D.Force);
         }
     }
 }

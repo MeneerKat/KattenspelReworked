@@ -833,7 +833,7 @@ MonoBehaviour:
   highscoreText: {fileID: 1317488254}
   finalScoreText: {fileID: 449803442}
   catPrefab: {fileID: 2936534479845239911, guid: 0068e21eb9cc2af4a807710213d4ecf9, type: 3}
-  baseCatsPerSecond: 1
+  baseCatsPerSecond: 0.6
   scoreCooldownDivider: 2
   maximumCats: 20
   horizontalSpeed: 200
@@ -841,7 +841,7 @@ MonoBehaviour:
   rotationSpeed: 50
   bounces: 2
   bounceHeightExponent: 0.5
-  evilPercentage: 50
+  evilPercentage: 30
   evilDamage: 1
   coolPercentage: 5
   coolHealing: 1
@@ -849,9 +849,15 @@ MonoBehaviour:
   surroundingSpawnRateIncrease: 1.35
   surroundingStartPosition: {x: 0, y: 0}
   nukePrefab: {fileID: 6805678765532143991, guid: 5631535f4c4b68443b015949431ae5ff, type: 3}
+  nukeTargetPrefab: {fileID: 6805678765532143991, guid: e5c27bf8da2431742971e19c8f228aad, type: 3}
   nukeSpeed: 150
   nukeRange: 8
-  nukeMaxForce: 2000
+  nukeMaxForce: 1000
+  nukeMinSpawnTime: 5
+  nukeMaxSpawnTime: 30
+  nukeSpawnDifferencePerOoM: 0.6
+  nukeMinimumScore: 2500
+  nukeTargetRotationSpeed: 180
   catImage1: {fileID: -2359638610136418311, guid: 4ff1120acd522444080c69e140bcd341, type: 3}
   catImage2: {fileID: 8903766432266672828, guid: 8806dc2d68a34f9429d520efceff9579, type: 3}
   catImage3: {fileID: 8245074977905487612, guid: 3fb4f88fe883e914e9fcbe8a821cb10b, type: 3}
