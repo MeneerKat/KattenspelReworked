@@ -837,8 +837,8 @@ MonoBehaviour:
   baseCatsPerSecond: 1
   scoreCooldownDivider: 2
   maximumCats: 20
-  horizontalSpeed: 0
-  verticalSpeed: -200
+  horizontalSpeed: 200
+  verticalSpeed: 200
   rotationSpeed: 50
   bounces: 2
   bounceHeightExponent: 0.5
@@ -856,6 +856,12 @@ MonoBehaviour:
   evilCatImage2: {fileID: 3017414832053757675, guid: 5b12a32281039e24ba144b62d2c2f2d4, type: 3}
   evilCatImage3: {fileID: -1808383859175214585, guid: 87effa3c9d1abae48beea20e73604aa6, type: 3}
   coolCatImage1: {fileID: 3420957921114766939, guid: 0d40b078a82923c4ebf9396547939cfb, type: 3}
+  purrSound: {fileID: 8300000, guid: 4c42f8cdf9610d941b94f8df3352577b, type: 3}
+  hissSound: {fileID: 8300000, guid: 801f4f5e43e46b442984007b482032ae, type: 3}
+  healSound: {fileID: 8300000, guid: d3312c78decbc1f478c26d770429cb70, type: 3}
+  boingSound: {fileID: 8300000, guid: 665901cdde0ad284e9009c495eb943da, type: 3}
+  evilMeowSound: {fileID: 8300000, guid: ff0015098ebcd6b448f0c796a40b4ac0, type: 3}
+  crashSound: {fileID: 8300000, guid: 8d6c2ab103348c34a8a04d45f9fb6cad, type: 3}
 --- !u!4 &553778127
 Transform:
   m_ObjectHideFlags: 0

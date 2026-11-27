@@ -90,6 +90,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite evilCatImage3;
     [SerializeField] private Sprite coolCatImage1;
 
+    // Sounds
+    [Space]
+    [Header("Sound Effects")]
+    [SerializeField] private AudioClip purrSound;
+    [SerializeField] private AudioClip hissSound;
+    [SerializeField] private AudioClip healSound;
+    [SerializeField] private AudioClip boingSound;
+    [SerializeField] private AudioClip evilMeowSound;
+    [SerializeField] private AudioClip crashSound;
+
     // Statics (Ik weet niet hoe je een static kan serializen :sob:)
     static public bool bouncing = false;
     static public bool evilCats = false;
@@ -148,8 +158,6 @@ public class GameManager : MonoBehaviour
         UpdateScoreText();
     }
 
-
-
     void Update()
     {
         // Update all cats
@@ -157,11 +165,14 @@ public class GameManager : MonoBehaviour
         {
             // Move local cat
             CatClass localCat = activeCats[i];
-            localCat.MoveCat();
 
-            if (localCat.isActive == true)
+            if (localCat.isActive == false)
             {
                 activeCats.RemoveAt(i);
+            }
+            else
+            {
+                localCat.MoveCat(Time.deltaTime);
             }
         }
 
@@ -172,10 +183,28 @@ public class GameManager : MonoBehaviour
             if (activeCats.Count >= maximumCats) { return; }
 
             CatClass newCat = new CatClass(
-                catPrefab, new List<Sprite> { catImage1, catImage2, catImage3 },
-                horizontalSpeed, verticalSpeed, rotationSpeed);
+                catPrefab, 
+                new List<Sprite> { catImage1, catImage2, catImage3 },
+                horizontalSpeed, 
+                verticalSpeed, 
+                rotationSpeed,
+                purrSound,
+                boingSound,
+                crashSound);
 
-            activeCats.Add(newCat);
+            CatClass newEvilCat = new EvilCat(
+                catPrefab,
+                new List<Sprite> { evilCatImage1, evilCatImage2, evilCatImage3 },
+                horizontalSpeed,
+                verticalSpeed,
+                rotationSpeed,
+                purrSound,
+                boingSound,
+                crashSound,
+                hissSound,
+                evilMeowSound);
+
+            activeCats.Add(newEvilCat);
 
             timer = 0f;
         }
@@ -213,20 +242,6 @@ public class GameManager : MonoBehaviour
         // End the game when player is at 0 health
         if (currentHealth == 0)
             EndGame();
-    }
-
-    // Freeze positions to prevent bouncing in the wrong direction
-    public void FreezePositions(Rigidbody2D rb, bool horizontalMovement, bool verticalMovement)
-    {
-        if (!horizontalMovement)
-            rb.constraints |= RigidbodyConstraints2D.FreezePositionX;
-        else
-            rb.constraints &= ~RigidbodyConstraints2D.FreezePositionX;
-
-        if (!verticalMovement)
-            rb.constraints |= RigidbodyConstraints2D.FreezePositionY;
-        else
-            rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
     }
 
     // Ends the game

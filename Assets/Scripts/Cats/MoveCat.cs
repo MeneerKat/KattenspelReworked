@@ -158,7 +158,7 @@ public class MoveCat : MonoBehaviour
         // Random Size
         catSize = (UnityEngine.Random.value * 0.1f + 0.25f);
         transform.localScale = new UnityEngine.Vector2(catSize, catSize);
-        GameManager.Instance.FreezePositions(rb, horizontalSpeed != 0, verticalSpeed != 0);
+        //GameManager.Instance.FreezePositions(rb, horizontalSpeed != 0, verticalSpeed != 0);
 
         // Determine type (normal/evil/cool) and apply sprite
         ArrayList catSprites;

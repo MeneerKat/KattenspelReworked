@@ -38,7 +38,7 @@ public class MovePlayer : MonoBehaviour
         cam = Camera.main;
 
         // Freeze positions to prevent going off the axis
-        GameManager.Instance.FreezePositions(rb, horizontalMovement, verticalMovement);
+        //GameManager.Instance.FreezePositions(rb, horizontalMovement, verticalMovement);
     }
 
     // Cat collision

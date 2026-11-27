@@ -1,105 +1,283 @@
-using NUnit.Framework;
+
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEditor.U2D;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class CatClass
 {
     // Variables
     public bool isActive;
 
+    // Screen
     float screenSizeX;
     float screenSizeY;
+
+    // Movement
     float horizontalSpeed;
     float verticalSpeed;
     float rotationSpeed;
+    float catSize;
 
+    // GameObjects
     GameObject catPrefab;
-    GameObject catObject;
+    public GameObject catObject;
+
+    // Sprites
     List<Sprite> catSprites;
     Rigidbody2D rb;
+    SpriteRenderer spriteRenderer;
+
+    // Spawn
+    string spawnSide;
+
+    // Bouncing
+    bool bouncing;
+    float bounceHeightExponent = 1f;
+    int bounces;
+
+    // Invisible
+    bool invisibleCats;
+    float invisibilityTime;
+    float currentTransparency;
+
+    // Audio
+    AudioClip purrSound;
+    AudioClip boingSound;
+    AudioClip crashSound;
 
     // Constructor
     public CatClass(
-        GameObject CatPrefab, List<Sprite> CatSprites, 
-        float HorizontalSpeed, float VerticalSpeed, float RotationSpeed) 
+        GameObject CatPrefab,
+        List<Sprite> CatSprites,
+        float HorizontalSpeed,
+        float VerticalSpeed,
+        float RotationSpeed,
+        AudioClip PurrSound,
+        AudioClip BoingSound,
+        AudioClip CrashSound)
     {
-        this.catPrefab = CatPrefab;
-        this.catSprites = CatSprites;
+        catPrefab = CatPrefab;
+        catSprites = CatSprites;
 
-        this.horizontalSpeed = HorizontalSpeed;
-        this.verticalSpeed = VerticalSpeed;
-        this.rotationSpeed = RotationSpeed;
+        horizontalSpeed = HorizontalSpeed;
+        verticalSpeed = VerticalSpeed;
+        rotationSpeed = RotationSpeed;
+
+        purrSound = PurrSound;
+        boingSound = BoingSound;
+        crashSound = CrashSound;
+
+        // Bouncing settings
+        bouncing = GameManager.bouncing;
+
+        if (bouncing)
+        {
+            bounceHeightExponent = GameManager.Instance.bounceHeightExponent;
+            bounces = GameManager.Instance.bounces;
+        }
+
+        // Invisible settings
+        invisibleCats = GameManager.invisibleCats;
+
+        if (invisibleCats)
+        {
+            invisibilityTime = GameManager.Instance.invisibilityTime;
+        }
 
         GetScreenBorders();
         CreateGameObject();
 
-        this.isActive = true;
+        isActive = true;
     }
 
     // Get screen borders
-    private void GetScreenBorders()
+    public void GetScreenBorders()
     {
         Camera cam = Camera.main;
-        this.screenSizeX = cam.orthographicSize * cam.aspect;
-        this.screenSizeY = cam.orthographicSize;
+
+        screenSizeX = cam.orthographicSize * cam.aspect;
+        screenSizeY = cam.orthographicSize;
     }
 
     // Create the cat
     public virtual void CreateGameObject()
     {
-        // Create prefab
-        this.catObject = GameObject.Instantiate(catPrefab);
-        this.rb = catObject.GetComponent<Rigidbody2D>();
+        catObject = GameObject.Instantiate(catPrefab);
 
-        // Set sprite
-        int randomSpriteIndex = UnityEngine.Random.Range(0, catSprites.Count);
-        catObject.GetComponent<SpriteRenderer>().sprite = catSprites[randomSpriteIndex];
+        rb = catObject.GetComponent<Rigidbody2D>();
+        spriteRenderer = catObject.GetComponent<SpriteRenderer>();
+
+        // Random rotation
+        rotationSpeed = Random.Range(-180f, 180f);
+
+        // Random size
+        catSize = Random.Range(0.25f, 0.35f);
+        catObject.transform.localScale = new Vector2(catSize, catSize);
+
+        // Random sprite
+        int randomSpriteIndex = Random.Range(0, catSprites.Count);
+        spriteRenderer.sprite = catSprites[randomSpriteIndex];
 
         // Connect collision script
         CatCollision collision = catObject.GetComponent<CatCollision>();
         collision.SetCatClass(this);
 
-        // Move to spawn position
+        // Spawn
         SpawnPosition();
     }
 
     // Move to spawn position
     public virtual void SpawnPosition()
     {
-        // Random vertical pos above screen
-        float verticalPos = 0;
-        float horizontalPos = screenSizeY + catObject.transform.localScale.y/2;
-        catObject.transform.position = new Vector2(verticalPos, horizontalPos);
+        // Available spawn positions
+        List<string> spawnPositions = new() { "Top" };
+
+        if (GameManager.surroundingCats)
+        {
+            spawnPositions.Add("Bottom");
+            spawnPositions.Add("Right");
+            spawnPositions.Add("Left");
+        }
+
+        spawnSide = spawnPositions[Random.Range(0, spawnPositions.Count)];
+
+        float xPos = 0f;
+        float yPos = 0f;
+
+        // Bottom
+        if (spawnSide == "Bottom")
+        {
+            xPos = Random.Range(-screenSizeX + 0.5f, screenSizeX - 0.5f);
+            yPos = -screenSizeY - 1f;
+
+            horizontalSpeed = 0f;
+        }
+
+        // Top
+        else if (spawnSide == "Top")
+        {
+            xPos = Random.Range(-screenSizeX + 0.5f, screenSizeX - 0.5f);
+            yPos = screenSizeY + 1f;
+
+            verticalSpeed *= -1f;
+            horizontalSpeed = 0f;
+        }
+
+        // Right
+        else if (spawnSide == "Right")
+        {
+            xPos = screenSizeX + 1f;
+            yPos = Random.Range(-screenSizeY + 0.5f, screenSizeY - 0.5f);
+
+            verticalSpeed = 0f;
+            horizontalSpeed *= -1f;
+        }
+
+        // Left
+        else if (spawnSide == "Left")
+        {
+            xPos = -screenSizeX - 1f;
+            yPos = Random.Range(-screenSizeY + 0.5f, screenSizeY - 0.5f);
+
+            verticalSpeed = 0f;
+        }
+
+        catObject.transform.position = new Vector3(xPos, yPos, 1f);
+    }
+
+    // On Miss
+    public virtual void Miss()
+    {
+        GameManager.Instance.RemoveHealth(GameManager.Instance.damagePerHit);
+        AudioSource.PlayClipAtPoint(crashSound, catObject.transform.position);
+    }
+
+    // On Hit
+    public virtual void Hit()
+    {
+        GameManager.Instance.AddScore();
+        AudioSource.PlayClipAtPoint(purrSound, catObject.transform.position);
     }
 
     // Add score on hit
     public virtual void OnHit()
     {
-        GameManager.Instance.AddScore();
-        UnityEngine.Object.Destroy(catObject);
-        isActive = false;
-    }
-
-    // Check if cat reached other side
-    public virtual void BorderCheck()
-    {
-        if (catObject.transform.position.y <= -screenSizeY - catObject.transform.localScale.x)
+        if (bouncing && bounces > 0)
         {
-            GameManager.Instance.RemoveHealth(GameManager.Instance.damagePerHit);
-            UnityEngine.Object.Destroy(catObject);
-            isActive = false;
+            // Bounce formula
+            float bounceHeightMultiplier = Mathf.Pow(bounces,bounceHeightExponent);
+            rb.linearVelocity = new Vector2((bounceHeightMultiplier * -horizontalSpeed) / 40f, (bounceHeightMultiplier * -verticalSpeed) / 40f);
+
+            AudioSource.PlayClipAtPoint(boingSound, catObject.transform.position);
+
+            bounces--;
+        }
+        else
+        {
+            Hit();
+            DestroyCat();
         }
     }
 
-    public virtual void MoveCat()
+    // Destroy cat
+    private void DestroyCat()
     {
-        rb.AddForce(new Vector2(horizontalSpeed, verticalSpeed),ForceMode2D.Force);
-        catObject.transform.Rotate(0f, 0f, rotationSpeed * Time.deltaTime, Space.Self);
+        Object.Destroy(catObject);
+        isActive = false;
+    }
+
+    // Check if cat reached the other side
+    public virtual void BorderCheck()
+    {
+        bool outOfBounds = false;
+
+        if (spawnSide == "Top" && catObject.transform.position.y <= -screenSizeY - catSize)
+            outOfBounds = true;
+
+        else if (spawnSide == "Bottom" && catObject.transform.position.y >= screenSizeY + catSize)
+            outOfBounds = true;
+
+        else if (spawnSide == "Right" && catObject.transform.position.x <= -screenSizeX - catSize)
+            outOfBounds = true;
+
+        else if (spawnSide == "Left" && catObject.transform.position.x >= screenSizeX + catSize)
+            outOfBounds = true;
+
+        if (outOfBounds)
+        {
+            Miss();
+            DestroyCat();
+        }
+    }
+
+    // Check if cat is out of bounds
+    public virtual bool OutOfBoundsCheck()
+    {
+        if (!isActive)
+            return true;
+
+        BorderCheck();
+
+        return !isActive;
+    }
+
+    // Move the cat and rotate it
+    public virtual void MoveCat(float deltaTime)
+    {
+        if (!isActive)
+            return;
+
+        rb.AddForce(new Vector2(horizontalSpeed * deltaTime, verticalSpeed * deltaTime));
+
+        catObject.transform.Rotate(0f, 0f, rotationSpeed * deltaTime, Space.Self);
+
+        // Invisible cats
+        if (invisibleCats)
+        {
+            currentTransparency += (1f / invisibilityTime) * deltaTime;
+
+            spriteRenderer.color = new Color(1f, 1f, 1f, 1f - currentTransparency);
+        }
 
         BorderCheck();
     }
 }
-
