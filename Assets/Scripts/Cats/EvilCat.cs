@@ -38,7 +38,7 @@ public class EvilCat : CatClass
     // Override hit function
     public override void OnHit()
     {
-        GameManager.Instance.RemoveHealth(1);
+        GameManager.Instance.RemoveHealth(GameManager.Instance.evilDamage);
         AudioSource.PlayClipAtPoint(hissSound, catObject.transform.position);
         DestroyCat();
     }

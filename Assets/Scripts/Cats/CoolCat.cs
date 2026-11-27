@@ -35,7 +35,7 @@ public class CoolCat : CatClass
     // Override hit function
     public override void Hit()
     {
-        GameManager.Instance.HealHealth(1);
+        GameManager.Instance.HealHealth(GameManager.Instance.coolHealing);
         AudioSource.PlayClipAtPoint(healSound, catObject.transform.position);
     }
 }

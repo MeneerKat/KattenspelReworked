@@ -847,7 +847,7 @@ MonoBehaviour:
   coolPercentage: 5
   coolHealing: 1
   invisibilityTime: 2.2
-  surroundingSpawnRateIncrease: 1.5
+  surroundingSpawnRateIncrease: 1.35
   surroundingStartPosition: {x: 0, y: 0}
   catImage1: {fileID: -2359638610136418311, guid: 4ff1120acd522444080c69e140bcd341, type: 3}
   catImage2: {fileID: 8903766432266672828, guid: 8806dc2d68a34f9429d520efceff9579, type: 3}

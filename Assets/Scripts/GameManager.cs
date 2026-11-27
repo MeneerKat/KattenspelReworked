@@ -28,8 +28,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] public int maxHealth = 5;
     [SerializeField] public int startHealth = 5;
     [SerializeField] public int currentHealth = 5;
-    [SerializeField] public int damagePerHit = 1;
-    [SerializeField] public int healingPerHit = 1;
     [SerializeField] public Vector2 baseStartPosition = new Vector2(0, -4);
 
     // User Interface settings
@@ -169,6 +167,7 @@ public class GameManager : MonoBehaviour
 
             if (localCat.isActive == false)
             {
+                localCat.DestroyCat();
                 activeCats.RemoveAt(i);
             }
             else
@@ -269,7 +268,12 @@ public class GameManager : MonoBehaviour
     {
         // Destroy all active cats
         maximumCats = 0;
-        activeCats = new List<CatClass>();
+
+        foreach (CatClass cat in activeCats)
+        {
+            cat.DestroyCat();
+            cat.isActive = false;
+        }
 
         // Switch UI
         backgroundCanvas.SetActive(false);
