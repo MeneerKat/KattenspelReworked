@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public int maxHealth = 5;
     [SerializeField] public int startHealth = 5;
     [SerializeField] public int currentHealth = 5;
+    [SerializeField] public int damagePerHit = 1;
     [SerializeField] public Vector2 baseStartPosition = new Vector2(0, -4);
 
     // User Interface settings
